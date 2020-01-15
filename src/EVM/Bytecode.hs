@@ -1,9 +1,6 @@
-{-# LANGUAGE DeriveGeneric, MultiParamTypeClasses, FlexibleInstances #-}
 module EVM.Bytecode where
 
 import Prelude (Show, Eq, Ord, concatMap, (++), (==), error)
-import GHC.Generics
---import Test.SmallCheck.Series
 import qualified Data.ByteString as B
 import Data.Word
 
@@ -148,13 +145,7 @@ data Opcode
   | STATICCALL
   | REVERT
   | SELFDESTRUCT  
-  deriving (Show, Eq, Ord, Generic)
-
---instance Monad m => Serial m Opcode
-
---instance Generic B.ByteString where
-
---instance Monad m => Serial m B.ByteString
+  deriving (Show, Eq, Ord)
 
 type Bytecode = [Opcode]
 

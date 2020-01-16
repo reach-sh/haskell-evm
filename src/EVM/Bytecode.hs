@@ -1,7 +1,6 @@
 module EVM.Bytecode where
 
-import Prelude (Show, Eq, Ord, concatMap, (++), (==), error)
-import qualified Data.ByteString as B
+import Prelude (Show, Eq, Ord, concatMap, (++), (==), error, splitAt, length)
 import Data.Word
 
 data Opcode
@@ -67,38 +66,38 @@ data Opcode
   | MSIZE
   | GAS
   | JUMPDEST
-  | PUSH1 B.ByteString
-  | PUSH2 B.ByteString
-  | PUSH3 B.ByteString
-  | PUSH4 B.ByteString
-  | PUSH5 B.ByteString
-  | PUSH6 B.ByteString
-  | PUSH7 B.ByteString
-  | PUSH8 B.ByteString
-  | PUSH9 B.ByteString
-  | PUSH10 B.ByteString
-  | PUSH11 B.ByteString
-  | PUSH12 B.ByteString
-  | PUSH13 B.ByteString
-  | PUSH14 B.ByteString
-  | PUSH15 B.ByteString
-  | PUSH16 B.ByteString
-  | PUSH17 B.ByteString
-  | PUSH18 B.ByteString
-  | PUSH19 B.ByteString
-  | PUSH20 B.ByteString
-  | PUSH21 B.ByteString
-  | PUSH22 B.ByteString
-  | PUSH23 B.ByteString
-  | PUSH24 B.ByteString
-  | PUSH25 B.ByteString
-  | PUSH26 B.ByteString
-  | PUSH27 B.ByteString
-  | PUSH28 B.ByteString
-  | PUSH29 B.ByteString
-  | PUSH30 B.ByteString
-  | PUSH31 B.ByteString
-  | PUSH32 B.ByteString
+  | PUSH1 [Word8]
+  | PUSH2 [Word8]
+  | PUSH3 [Word8]
+  | PUSH4 [Word8]
+  | PUSH5 [Word8]
+  | PUSH6 [Word8]
+  | PUSH7 [Word8]
+  | PUSH8 [Word8]
+  | PUSH9 [Word8]
+  | PUSH10 [Word8]
+  | PUSH11 [Word8]
+  | PUSH12 [Word8]
+  | PUSH13 [Word8]
+  | PUSH14 [Word8]
+  | PUSH15 [Word8]
+  | PUSH16 [Word8]
+  | PUSH17 [Word8]
+  | PUSH18 [Word8]
+  | PUSH19 [Word8]
+  | PUSH20 [Word8]
+  | PUSH21 [Word8]
+  | PUSH22 [Word8]
+  | PUSH23 [Word8]
+  | PUSH24 [Word8]
+  | PUSH25 [Word8]
+  | PUSH26 [Word8]
+  | PUSH27 [Word8]
+  | PUSH28 [Word8]
+  | PUSH29 [Word8]
+  | PUSH30 [Word8]
+  | PUSH31 [Word8]
+  | PUSH32 [Word8]
   | DUP1
   | DUP2
   | DUP3
@@ -149,160 +148,156 @@ data Opcode
 
 type Bytecode = [Opcode]
 
-decode :: B.ByteString -> Bytecode
-decode bs =
-  if B.null bs then
-    []
-  else
-    case opc of
-      0x00 -> STOP : more
-      0x01 -> ADD : more
-      0x02 -> MUL : more
-      0x03 -> SUB : more
-      0x04 -> DIV : more
-      0x05 -> SDIV : more
-      0x06 -> MOD : more
-      0x07 -> SMOD : more
-      0x08 -> ADDMOD : more
-      0x09 -> MULMOD : more
-      0x0A -> EXP : more
-      0x0B -> SIGNEXTEND : more
-      0x10 -> LT : more
-      0x11 -> GT : more
-      0x12 -> SLT : more
-      0x13 -> SGT : more
-      0x14 -> EQ : more
-      0x15 -> ISZERO : more
-      0x16 -> AND : more
-      0x17 -> OR : more
-      0x18 -> XOR : more
-      0x19 -> NOT : more
-      0x1A -> BYTE : more
-      0x1B -> SHL : more
-      0x1C -> SHR : more
-      0x1D -> SAR : more
-      0x20 -> SHA3 : more
-      0x30 -> ADDRESS : more
-      0x31 -> BALANCE : more
-      0x32 -> ORIGIN : more
-      0x33 -> CALLER : more
-      0x34 -> CALLVALUE : more
-      0x35 -> CALLDATALOAD : more
-      0x36 -> CALLDATASIZE : more
-      0x37 -> CALLDATACOPY : more
-      0x38 -> CODESIZE : more
-      0x39 -> CODECOPY : more
-      0x3A -> GASPRICE : more
-      0x3B -> EXTCODESIZE : more
-      0x3C -> EXTCODECOPY : more
-      0x3D -> RETURNDATASIZE : more
-      0x3E -> RETURNDATACOPY : more
-      0x3F -> EXTCODEHASH : more
-      0x40 -> BLOCKHASH : more
-      0x41 -> COINBASE : more
-      0x42 -> TIMESTAMP : more
-      0x43 -> NUMBER : more
-      0x44 -> DIFFICULTY : more
-      0x45 -> GASLIMIT : more
-      0x50 -> POP : more
-      0x51 -> MLOAD : more
-      0x52 -> MSTORE : more
-      0x53 -> MSTORE8 : more
-      0x54 -> SLOAD : more
-      0x55 -> SSTORE : more
-      0x56 -> JUMP : more
-      0x57 -> JUMPI : more
-      0x58 -> PC : more
-      0x59 -> MSIZE : more
-      0x5A -> GAS : more
-      0x5B -> JUMPDEST : more
-      0x60 -> next PUSH1 1
-      0x61 -> next PUSH2 2
-      0x62 -> next PUSH3 3
-      0x63 -> next PUSH4 4
-      0x64 -> next PUSH5 5
-      0x65 -> next PUSH6 6
-      0x66 -> next PUSH7 7
-      0x67 -> next PUSH8 8
-      0x68 -> next PUSH9 9
-      0x69 -> next PUSH10 10
-      0x6A -> next PUSH11 11
-      0x6B -> next PUSH12 12
-      0x6C -> next PUSH13 13
-      0x6D -> next PUSH14 14
-      0x6E -> next PUSH15 15
-      0x6F -> next PUSH16 16
-      0x70 -> next PUSH17 17
-      0x71 -> next PUSH18 18
-      0x72 -> next PUSH19 19
-      0x73 -> next PUSH20 20
-      0x74 -> next PUSH21 21
-      0x75 -> next PUSH22 22
-      0x76 -> next PUSH23 23
-      0x77 -> next PUSH24 24
-      0x78 -> next PUSH25 25
-      0x79 -> next PUSH26 26
-      0x7A -> next PUSH27 27
-      0x7B -> next PUSH28 28
-      0x7C -> next PUSH29 29
-      0x7D -> next PUSH30 30
-      0x7E -> next PUSH31 31
-      0x7F -> next PUSH32 32
-      0x80 -> DUP1 : more
-      0x81 -> DUP2 : more
-      0x82 -> DUP3 : more
-      0x83 -> DUP4 : more
-      0x84 -> DUP5 : more
-      0x85 -> DUP6 : more
-      0x86 -> DUP7 : more
-      0x87 -> DUP8 : more
-      0x88 -> DUP9 : more
-      0x89 -> DUP10 : more
-      0x8A -> DUP11 : more
-      0x8B -> DUP12 : more
-      0x8C -> DUP13 : more
-      0x8D -> DUP14 : more
-      0x8E -> DUP15 : more
-      0x8F -> DUP16 : more
-      0x90 -> SWAP1 : more
-      0x91 -> SWAP2 : more
-      0x92 -> SWAP3 : more
-      0x93 -> SWAP4 : more
-      0x94 -> SWAP5 : more
-      0x95 -> SWAP6 : more
-      0x96 -> SWAP7 : more
-      0x97 -> SWAP8 : more
-      0x98 -> SWAP9 : more
-      0x99 -> SWAP10 : more
-      0x9A -> SWAP11 : more
-      0x9B -> SWAP12 : more
-      0x9C -> SWAP13 : more
-      0x9D -> SWAP14 : more
-      0x9E -> SWAP15 : more
-      0x9F -> SWAP16 : more
-      0xA0 -> LOG0 : more
-      0xA1 -> LOG1 : more
-      0xA2 -> LOG2 : more
-      0xA3 -> LOG3 : more
-      0xA4 -> LOG4 : more
-      0xF0 -> CREATE : more
-      0xF1 -> CALL : more
-      0xF2 -> CALLCODE : more
-      0xF3 -> RETURN : more
-      0xF4 -> DELEGATECALL : more
-      0xF5 -> CREATE2 : more
-      0xFA -> STATICCALL : more
-      0xFD -> REVERT : more
-      0xFF -> SELFDESTRUCT : more
-      _ -> INVALID opc : more
-  where opc = B.head bs
-        r = B.tail bs
-        more = decode r
+decode :: [Word8] -> Bytecode
+decode [] = []
+decode (opc : r) =
+  case opc of
+    0x00 -> STOP : more
+    0x01 -> ADD : more
+    0x02 -> MUL : more
+    0x03 -> SUB : more
+    0x04 -> DIV : more
+    0x05 -> SDIV : more
+    0x06 -> MOD : more
+    0x07 -> SMOD : more
+    0x08 -> ADDMOD : more
+    0x09 -> MULMOD : more
+    0x0A -> EXP : more
+    0x0B -> SIGNEXTEND : more
+    0x10 -> LT : more
+    0x11 -> GT : more
+    0x12 -> SLT : more
+    0x13 -> SGT : more
+    0x14 -> EQ : more
+    0x15 -> ISZERO : more
+    0x16 -> AND : more
+    0x17 -> OR : more
+    0x18 -> XOR : more
+    0x19 -> NOT : more
+    0x1A -> BYTE : more
+    0x1B -> SHL : more
+    0x1C -> SHR : more
+    0x1D -> SAR : more
+    0x20 -> SHA3 : more
+    0x30 -> ADDRESS : more
+    0x31 -> BALANCE : more
+    0x32 -> ORIGIN : more
+    0x33 -> CALLER : more
+    0x34 -> CALLVALUE : more
+    0x35 -> CALLDATALOAD : more
+    0x36 -> CALLDATASIZE : more
+    0x37 -> CALLDATACOPY : more
+    0x38 -> CODESIZE : more
+    0x39 -> CODECOPY : more
+    0x3A -> GASPRICE : more
+    0x3B -> EXTCODESIZE : more
+    0x3C -> EXTCODECOPY : more
+    0x3D -> RETURNDATASIZE : more
+    0x3E -> RETURNDATACOPY : more
+    0x3F -> EXTCODEHASH : more
+    0x40 -> BLOCKHASH : more
+    0x41 -> COINBASE : more
+    0x42 -> TIMESTAMP : more
+    0x43 -> NUMBER : more
+    0x44 -> DIFFICULTY : more
+    0x45 -> GASLIMIT : more
+    0x50 -> POP : more
+    0x51 -> MLOAD : more
+    0x52 -> MSTORE : more
+    0x53 -> MSTORE8 : more
+    0x54 -> SLOAD : more
+    0x55 -> SSTORE : more
+    0x56 -> JUMP : more
+    0x57 -> JUMPI : more
+    0x58 -> PC : more
+    0x59 -> MSIZE : more
+    0x5A -> GAS : more
+    0x5B -> JUMPDEST : more
+    0x60 -> next PUSH1 1
+    0x61 -> next PUSH2 2
+    0x62 -> next PUSH3 3
+    0x63 -> next PUSH4 4
+    0x64 -> next PUSH5 5
+    0x65 -> next PUSH6 6
+    0x66 -> next PUSH7 7
+    0x67 -> next PUSH8 8
+    0x68 -> next PUSH9 9
+    0x69 -> next PUSH10 10
+    0x6A -> next PUSH11 11
+    0x6B -> next PUSH12 12
+    0x6C -> next PUSH13 13
+    0x6D -> next PUSH14 14
+    0x6E -> next PUSH15 15
+    0x6F -> next PUSH16 16
+    0x70 -> next PUSH17 17
+    0x71 -> next PUSH18 18
+    0x72 -> next PUSH19 19
+    0x73 -> next PUSH20 20
+    0x74 -> next PUSH21 21
+    0x75 -> next PUSH22 22
+    0x76 -> next PUSH23 23
+    0x77 -> next PUSH24 24
+    0x78 -> next PUSH25 25
+    0x79 -> next PUSH26 26
+    0x7A -> next PUSH27 27
+    0x7B -> next PUSH28 28
+    0x7C -> next PUSH29 29
+    0x7D -> next PUSH30 30
+    0x7E -> next PUSH31 31
+    0x7F -> next PUSH32 32
+    0x80 -> DUP1 : more
+    0x81 -> DUP2 : more
+    0x82 -> DUP3 : more
+    0x83 -> DUP4 : more
+    0x84 -> DUP5 : more
+    0x85 -> DUP6 : more
+    0x86 -> DUP7 : more
+    0x87 -> DUP8 : more
+    0x88 -> DUP9 : more
+    0x89 -> DUP10 : more
+    0x8A -> DUP11 : more
+    0x8B -> DUP12 : more
+    0x8C -> DUP13 : more
+    0x8D -> DUP14 : more
+    0x8E -> DUP15 : more
+    0x8F -> DUP16 : more
+    0x90 -> SWAP1 : more
+    0x91 -> SWAP2 : more
+    0x92 -> SWAP3 : more
+    0x93 -> SWAP4 : more
+    0x94 -> SWAP5 : more
+    0x95 -> SWAP6 : more
+    0x96 -> SWAP7 : more
+    0x97 -> SWAP8 : more
+    0x98 -> SWAP9 : more
+    0x99 -> SWAP10 : more
+    0x9A -> SWAP11 : more
+    0x9B -> SWAP12 : more
+    0x9C -> SWAP13 : more
+    0x9D -> SWAP14 : more
+    0x9E -> SWAP15 : more
+    0x9F -> SWAP16 : more
+    0xA0 -> LOG0 : more
+    0xA1 -> LOG1 : more
+    0xA2 -> LOG2 : more
+    0xA3 -> LOG3 : more
+    0xA4 -> LOG4 : more
+    0xF0 -> CREATE : more
+    0xF1 -> CALL : more
+    0xF2 -> CALLCODE : more
+    0xF3 -> RETURN : more
+    0xF4 -> DELEGATECALL : more
+    0xF5 -> CREATE2 : more
+    0xFA -> STATICCALL : more
+    0xFD -> REVERT : more
+    0xFF -> SELFDESTRUCT : more
+    _ -> INVALID opc : more
+  where more = decode r
         next o k = o ks : decode rks
-          where (ks, rks) = B.splitAt k r
+          where (ks, rks) = splitAt k r
 
-encode :: Bytecode -> B.ByteString
-encode bc = B.pack (concatMap encode1 bc)
+encode :: Bytecode -> [Word8]
+encode bc = concatMap encode1 bc
 
 encode1 :: Opcode -> [Word8]
 encode1 op =
@@ -448,5 +443,5 @@ encode1 op =
       SELFDESTRUCT -> [0xFF]
       INVALID opc -> [opc]
   where next n k =
-          if B.length n == k then B.unpack n
+          if length n == k then n
           else error "encode: illegal lengthed constant"

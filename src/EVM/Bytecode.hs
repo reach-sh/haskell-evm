@@ -1,8 +1,24 @@
-module EVM.Bytecode where
+{-|
+Module : EVM.Bytecode
+Description : Decode and encode EVM bytecode
+Copyright : Reach, 2019
+License : Apache-2.0
+Maintainer : jay@reach.sh
+
+This library has a straight-forward representation of EVM bytecode
+with encoding and decoding to Word8 lists.
+-}
+module EVM.Bytecode
+  (
+    Opcode (..)
+  , encode
+  , decode
+  ) where
 
 import Prelude (Show, Eq, Ord, concatMap, (++), (==), error, splitAt, length)
 import Data.Word
 
+-- |'Opcode' represents each opcode in the bytecode, as well as invalid bytes.
 data Opcode
   = INVALID Word8
   | STOP
@@ -146,9 +162,10 @@ data Opcode
   | SELFDESTRUCT  
   deriving (Show, Eq, Ord)
 
-type Bytecode = [Opcode]
-
-decode :: [Word8] -> Bytecode
+-- |This will error if a PUSH instruction is not followed by the
+-- appropriate number of bytes; for example, if 'PUSH2' does not
+-- precede two bytes.
+decode :: [Word8] -> [Opcode]
 decode [] = []
 decode (opc : r) =
   case opc of
@@ -296,7 +313,10 @@ decode (opc : r) =
         next o k = o ks : decode rks
           where (ks, rks) = splitAt k r
 
-encode :: Bytecode -> [Word8]
+-- |This will error if PUSH instructions do not have the correct
+-- number of bytes; for example, if a 'PUSH2' does not have a two byte
+-- list.
+encode :: [Opcode] -> [Word8]
 encode bc = concatMap encode1 bc
 
 encode1 :: Opcode -> [Word8]

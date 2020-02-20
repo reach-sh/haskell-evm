@@ -15,12 +15,12 @@ module EVM.Bytecode
   , decode
   ) where
 
-import Prelude (Show, Eq, Ord, concatMap, (++), (==), error, splitAt, length)
+import Prelude (Show, Eq, Ord, concatMap, (++), (==), error, splitAt, length, String)
 import Data.Word
 
 -- |'Opcode' represents each opcode in the bytecode, as well as invalid bytes.
 data Opcode
-  = INVALID Word8
+  = INVALID Word8 String
   | STOP
   | ADD
   | MUL
@@ -308,7 +308,7 @@ decode (opc : r) =
     0xFA -> STATICCALL : more
     0xFD -> REVERT : more
     0xFF -> SELFDESTRUCT : more
-    _ -> INVALID opc : more
+    _ -> INVALID opc "" : more
   where more = decode r
         next o k = o ks : decode rks
           where (ks, rks) = splitAt k r
@@ -461,7 +461,7 @@ encode1 op =
       STATICCALL -> [0xFA]
       REVERT -> [0xFD]
       SELFDESTRUCT -> [0xFF]
-      INVALID opc -> [opc]
+      INVALID opc _ -> [opc]
   where next n k =
           if length n == k then n
           else error "encode: illegal lengthed constant"
